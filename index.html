@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Book your car service appointment online. Choose your preferred mechanic and schedule a convenient time at AutoCare Workshop.">
+    <title>AutoCare Workshop — Book Appointment</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="navbar-brand">
+                <div class="brand-icon">🔧</div>
+                <div class="brand-text"><span>AutoCare</span> Workshop</div>
+            </a>
+            <ul class="navbar-links">
+                <li><a href="index.html" class="active">Book Appointment</a></li>
+                <li><span class="navbar-user" id="navUser"></span></li>
+                <li><a href="#" id="logoutLink" onclick="logoutUser(); return false;">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="main-container">
+        <div class="page-header">
+            <h1>Book Your <span class="gradient-text">Appointment</span></h1>
+            <p>Select your preferred mechanic and schedule a convenient service time — all from the comfort of your home.</p>
+        </div>
+        <div class="main-grid" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; align-items: start; max-width: 1200px; margin: 0 auto;">
+            <div style="display: flex; flex-direction: column; gap: 2rem;">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="icon">📋</div>
+                        <div>
+                            <h2>Appointment Form</h2>
+                            <p>Fill in your details and pick a mechanic</p>
+                        </div>
+                    </div>
+                    <form id="appointmentForm" novalidate>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="clientName">Full Name <span class="required">*</span></label>
+                                <input type="text" id="clientName" name="client_name" placeholder="e.g. Sandip Kumar Paul" required>
+                                <span class="error-msg" id="clientNameError">Please enter a valid name (letters, spaces, dots only).</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone Number <span class="required">*</span></label>
+                                <input type="tel" id="phone" name="phone" placeholder="e.g. 01712345678" required>
+                                <span class="error-msg" id="phoneError">Phone must contain only digits (7-15 digits).</span>
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="address">Address <span class="required">*</span></label>
+                                <input type="text" id="address" name="address" placeholder="e.g. House 12, Road 5, Dhanmondi, Dhaka" required>
+                                <span class="error-msg" id="addressError">Address is required.</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="carLicense">Car License Number <span class="required">*</span></label>
+                                <input type="text" id="carLicense" name="car_license" placeholder="e.g. DHA-KA-12-3456" required>
+                                <span class="error-msg" id="carLicenseError">Car license number is required.</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="carEngine">Car Engine Number <span class="required">*</span></label>
+                                <input type="text" id="carEngine" name="car_engine" placeholder="e.g. 4G63T2024XY" required>
+                                <span class="error-msg" id="carEngineError">Engine number must be alphanumeric (letters, digits, hyphens).</span>
+                                <span class="input-help">Only letters, digits, and hyphens allowed</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="appointmentDate">Appointment Date <span class="required">*</span></label>
+                                <input type="date" id="appointmentDate" name="appointment_date" required>
+                                <span class="error-msg" id="appointmentDateError">Please select a valid future date.</span>
+                                <span class="input-help">Select a date from today onward</span>
+                            </div>
+                            <div class="form-group">
+                                <label for="mechanicSelect">Select Mechanic <span class="required">*</span></label>
+                                <select id="mechanicSelect" name="mechanic_id" required>
+                                    <option value="">— Select a date first —</option>
+                                </select>
+                                <span class="error-msg" id="mechanicSelectError">Please select a mechanic.</span>
+                                <div class="mechanic-info" id="mechanicInfo" style="display: none;">
+                                    <span class="info-icon">ℹ️</span>
+                                    <span id="mechanicInfoText">Each mechanic can accept up to 4 appointments per day.</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="reset" class="btn btn-secondary" id="resetBtn">
+                                ↺ Reset
+                            </button>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                ✓ Book Appointment
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                <div class="help-section">
+                    <button class="help-toggle" id="helpToggle" type="button">
+                        <span class="help-icon">❓</span>
+                        <span>How to Book an Appointment</span>
+                        <span class="chevron">▼</span>
+                    </button>
+                    <div class="help-content" id="helpContent">
+                        <div class="help-content-inner">
+                            <div class="help-item">
+                                <div class="step">1</div>
+                                <div class="help-text">
+                                    <h4>Enter Your Personal Information</h4>
+                                    <p>Provide your full name, phone number, and address. These details are required so we can contact you if needed.</p>
+                                </div>
+                            </div>
+                            <div class="help-item">
+                                <div class="step">2</div>
+                                <div class="help-text">
+                                    <h4>Enter Car Details</h4>
+                                    <p>Enter your car license plate number and engine number. The engine number must contain only letters, digits, and hyphens.</p>
+                                </div>
+                            </div>
+                            <div class="help-item">
+                                <div class="step">3</div>
+                                <div class="help-text">
+                                    <h4>Select Appointment Date</h4>
+                                    <p>Pick a date from today onward. Once you select a date, the mechanic list will update to show available slots.</p>
+                                </div>
+                            </div>
+                            <div class="help-item">
+                                <div class="step">4</div>
+                                <div class="help-text">
+                                    <h4>Choose Your Mechanic</h4>
+                                    <p>Select your preferred mechanic from the dropdown. Each mechanic can handle up to 4 cars per day. Fully booked mechanics will be shown but disabled.</p>
+                                </div>
+                            </div>
+                            <div class="help-item">
+                                <div class="step">5</div>
+                                <div class="help-text">
+                                    <h4>Submit Your Booking</h4>
+                                    <p>Click "Book Appointment" to confirm. You'll receive a confirmation notification. Note: only one appointment per person per day is allowed.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon">📅</div>
+                    <div>
+                        <h2>My Appointments</h2>
+                        <p>Track your scheduled services and active notifications</p>
+                    </div>
+                </div>
+                <div id="appointmentsList" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <div style="text-align: center; color: var(--text-muted); padding: 2rem;">
+                        Loading your appointments...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2026 AutoCare Workshop. All rights reserved.</p>
+    </footer>
+    <script src="js/auth-guard.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

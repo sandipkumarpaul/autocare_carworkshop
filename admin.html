@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Admin panel for managing car workshop appointments. View, edit, and reassign client bookings.">
+    <title>AutoCare Workshop — Admin Panel</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="admin.html" class="navbar-brand">
+                <div class="brand-icon">🔧</div>
+                <div class="brand-text"><span>AutoCare</span> Workshop</div>
+            </a>
+            <ul class="navbar-links">
+                <li><a href="admin.html" class="active">Admin Panel</a></li>
+                <li><span class="navbar-user" id="navUser"></span></li>
+                <li><a href="#" id="logoutLink" onclick="logoutUser(); return false;">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="toast-container" id="toastContainer"></div>
+    <div class="main-container">
+        <div class="page-header">
+            <h1>Admin <span class="gradient-text">Dashboard</span></h1>
+            <p>View and manage all client appointments. Edit dates and reassign mechanics as needed.</p>
+        </div>
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-icon">📅</div>
+                <div>
+                    <div class="stat-value" id="statTotal">—</div>
+                    <div class="stat-label">Total Appointments</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">📆</div>
+                <div>
+                    <div class="stat-value" id="statToday">—</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👨‍🔧</div>
+                <div>
+                    <div class="stat-value" id="statMechanics">5</div>
+                    <div class="stat-label">Active Mechanics</div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">
+                <div class="icon">📋</div>
+                <div>
+                    <h2>Appointment List</h2>
+                    <p>All booked appointments across all mechanics</p>
+                </div>
+            </div>
+            <div class="filter-bar">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name, phone, license...">
+                <button class="btn btn-secondary btn-sm" id="refreshBtn" onclick="loadAppointments()">
+                    ↻ Refresh
+                </button>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table" id="appointmentTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Client Name</th>
+                            <th>Phone</th>
+                            <th>Car License</th>
+                            <th>Appointment Date</th>
+                            <th>Mechanic</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointmentTableBody">
+                    </tbody>
+                </table>
+            </div>
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">📭</div>
+                <h3>No Appointments Found</h3>
+                <p>There are no appointments in the system yet. Clients can book through the <a href="index.html" style="color: var(--accent-blue);">booking page</a>.</p>
+            </div>
+        </div>
+    </div>
+    <div class="modal-overlay" id="editModal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>✏️ Edit Appointment</h3>
+                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+            </div>
+            <form id="editForm" novalidate>
+                <input type="hidden" id="editAppointmentId">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Client Name</label>
+                        <input type="text" id="editClientName" readonly style="opacity: 0.6; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone</label>
+                        <input type="text" id="editPhone" readonly style="opacity: 0.6; cursor: not-allowed;">
+                    </div>
+                    <div class="form-group">
+                        <label>Car License</label>
+                        <input type="text" id="editCarLicense" readonly style="opacity: 0.6; cursor: not-allowed;">
+                    </div>
+                </div>
+                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="editDate">Appointment Date <span class="required">*</span></label>
+                        <input type="date" id="editDate" required>
+                        <span class="error-msg" id="editDateError">Please select a valid date.</span>
+                    </div>
+                    <div class="form-group">
+                        <label for="editMechanic">Assigned Mechanic <span class="required">*</span></label>
+                        <select id="editMechanic" required>
+                            <option value="">Loading...</option>
+                        </select>
+                        <span class="error-msg" id="editMechanicError">Please select a mechanic.</span>
+                        <div class="mechanic-info" id="editMechanicInfo" style="display: none;">
+                            <span class="info-icon">ℹ️</span>
+                            <span id="editMechanicInfoText"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-actions" style="margin-top: 1.5rem;">
+                    <button type="button" class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="saveEditBtn">✓ Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <footer class="footer">
+        <p>&copy; 2026 AutoCare Workshop. All rights reserved.</p>
+    </footer>
+    <script src="js/auth-guard.js" data-role="admin"></script>
+    <script src="js/admin.js"></script>
+</body>
+</html>
