@@ -4,9 +4,7 @@ An online appointment system for a car workshop. Clients sign up, pick a date an
 
 Built with plain PHP, MySQL, and vanilla JavaScript (no frameworks) as a university web development project.
 
-**Live demo:** https://autocare.infinityfreeapp.com/
-
-> **Demo admin login:** `admin@autocare.com` / `password`. You can also sign up as a new client.
+> **Demo admin login** (created by `db.sql`): `admin@autocare.com` / `password`. You can also sign up as a new client.
 
 ![Booking page](docs/screenshots/booking.png)
 
