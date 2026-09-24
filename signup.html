@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Create a client account to book car service appointments at AutoCare Workshop.">
     <title>AutoCare Workshop — Sign Up</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,7 +27,7 @@
             <h1>Create Your <span class="gradient-text">Account</span></h1>
             <p>Sign up as a client to book appointments with your preferred mechanic.</p>
         </div>
-        <div class="card auth-card" style="max-width: 460px; margin: 0 auto;">
+        <div class="card auth-card">
             <div class="card-header">
                 <div class="icon">📝</div>
                 <div>
@@ -35,10 +36,10 @@
                 </div>
             </div>
             <form id="signupForm" novalidate>
-                <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="name">Full Name <span class="required">*</span></label>
-                        <input type="text" id="name" name="name" placeholder="e.g. Sandip Kumar Paul" required>
+                        <input type="text" id="name" name="name" placeholder="e.g. Tanvir Hasan" required>
                         <span class="error-msg" id="nameError">Please enter a valid name.</span>
                     </div>
                     <div class="form-group">
@@ -58,8 +59,8 @@
                         <span class="error-msg" id="confirmPasswordError">Passwords do not match.</span>
                     </div>
                 </div>
-                <div class="form-actions" style="flex-direction: column; align-items: stretch;">
-                    <button type="submit" class="btn btn-success" id="signupBtn" style="width: 100%;">
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-success" id="signupBtn">
                         ✓ Create Account
                     </button>
                 </div>
@@ -72,124 +73,7 @@
     <footer class="footer">
         <p>&copy; 2026 AutoCare Workshop. All rights reserved.</p>
     </footer>
-    <script>
-        const API_BASE = 'api';
-        const toastContainer = document.getElementById('toastContainer');
-        const signupForm = document.getElementById('signupForm');
-        const signupBtn = document.getElementById('signupBtn');
-        // Toast system
-        function showToast(type, title, message, duration = 5000) {
-            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.classList.add('removing'); setTimeout(() => this.parentElement.remove(), 300)">&times;</button>
-            `;
-            toastContainer.appendChild(toast);
-            setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 300); }, duration);
-        }
-        // Check if already logged in
-        (async function checkSession() {
-            try {
-                const res = await fetch(`${API_BASE}/auth.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'check' })
-                });
-                const result = await res.json();
-                if (result.authenticated) {
-                    window.location.href = result.data.role === 'admin' ? 'admin.html' : 'index.html';
-                }
-            } catch (e) {  }
-        })();
-        // Validation helpers
-        function showError(id, msg) {
-            document.getElementById(id).classList.add('error');
-            const errEl = document.getElementById(id + 'Error');
-            if (msg) errEl.textContent = msg;
-            errEl.classList.add('visible');
-        }
-        function clearError(id) {
-            document.getElementById(id).classList.remove('error');
-            document.getElementById(id + 'Error').classList.remove('visible');
-        }
-        // Real-time validation
-        ['name', 'email', 'password', 'confirmPassword'].forEach(id => {
-            const el = document.getElementById(id);
-            if (el) {
-                el.addEventListener('input', () => {
-                    if (el.classList.contains('error')) clearError(id);
-                });
-            }
-        });
-        // Form submission
-        signupForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const name = document.getElementById('name').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            let hasError = false;
-            if (!name || !/^[a-zA-Z\s.'\-]+$/.test(name)) {
-                showError('name', 'Name should contain only letters, spaces, dots, and hyphens.');
-                hasError = true;
-            } else { clearError('name'); }
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                showError('email', 'Please enter a valid email address.');
-                hasError = true;
-            } else { clearError('email'); }
-            if (!password || password.length < 6) {
-                showError('password', 'Password must be at least 6 characters.');
-                hasError = true;
-            } else { clearError('password'); }
-            if (password !== confirmPassword) {
-                showError('confirmPassword', 'Passwords do not match.');
-                hasError = true;
-            } else if (confirmPassword) { clearError('confirmPassword'); }
-            if (hasError) {
-                showToast('warning', 'Validation Error', 'Please fix the highlighted fields.');
-                return;
-            }
-            // Submit
-            signupBtn.disabled = true;
-            const originalText = signupBtn.innerHTML;
-            signupBtn.innerHTML = '<span class="spinner"></span> Creating account...';
-            let responseText = '';
-            try {
-                const res = await fetch(`${API_BASE}/auth.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        action: 'signup',
-                        name, email, password,
-                        confirm_password: confirmPassword
-                    })
-                });
-                responseText = await res.text();
-                const result = JSON.parse(responseText);
-                if (result.success) {
-                    showToast('success', 'Account Created!', result.message);
-                    setTimeout(() => {
-                        window.location.href = 'index.html';
-                    }, 1000);
-                } else {
-                    const toastType = res.status === 409 ? 'warning' : 'error';
-                    showToast(toastType, 'Signup Failed', result.message);
-                }
-            } catch (error) {
-                console.error('Signup connection/parse error:', error);
-                console.error('Raw Server Response was:', responseText);
-                showToast('error', 'Connection/Server Error', 'Unable to parse server response. Check browser console (F12) for detailed logs.');
-            } finally {
-                signupBtn.disabled = false;
-                signupBtn.innerHTML = originalText;
-            }
-        });
-    </script>
+    <script src="js/common.js"></script>
+    <script src="js/signup.js"></script>
 </body>
 </html>
