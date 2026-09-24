@@ -1,6 +1,9 @@
+-- AutoCare Workshop — database schema and seed data.
+-- Safe to re-run: tables and seed rows are only created if missing.
 
-CREATE DATABASE IF NOT EXISTS car_workshop;
+CREATE DATABASE IF NOT EXISTS car_workshop CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 USE car_workshop;
+
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -9,11 +12,13 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('admin', 'client') NOT NULL DEFAULT 'client',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS mechanics (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
     specialization VARCHAR(150) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 CREATE TABLE IF NOT EXISTS appointments (
     id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NULL,
@@ -24,17 +29,21 @@ CREATE TABLE IF NOT EXISTS appointments (
     car_engine VARCHAR(50) NOT NULL,
     appointment_date DATE NOT NULL,
     mechanic_id INT NOT NULL,
-    is_updated_by_admin TINYINT(1) DEFAULT 0,
+    is_updated_by_admin TINYINT(1) NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (mechanic_id) REFERENCES mechanics(id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL,
-    UNIQUE KEY unique_client_date (user_id, appointment_date)
+    UNIQUE KEY unique_client_date (user_id, appointment_date),
+    KEY idx_mechanic_date (mechanic_id, appointment_date)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-INSERT INTO mechanics (name, specialization) VALUES
+
+INSERT IGNORE INTO mechanics (name, specialization) VALUES
 ('Rafiq Uddin', 'Engine Diagnostics & Overhaul'),
 ('Kamal Hossain', 'Transmission & Gearbox'),
 ('Jamal Ahmed', 'Electrical Systems & AC'),
 ('Shahidul Islam', 'Brake & Suspension'),
 ('Mizanur Rahman', 'Body Work & Painting');
-INSERT INTO users (name, email, password, role) VALUES
+
+-- Demo admin account (also shown on the login page): admin@autocare.com / password
+INSERT IGNORE INTO users (name, email, password, role) VALUES
 ('Workshop Admin', 'admin@autocare.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 'admin');

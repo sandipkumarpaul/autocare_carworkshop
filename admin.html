@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Admin panel for managing car workshop appointments. View, edit, and reassign client bookings.">
     <title>AutoCare Workshop — Admin Panel</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -17,7 +18,7 @@
             <ul class="navbar-links">
                 <li><a href="admin.html" class="active">Admin Panel</a></li>
                 <li><span class="navbar-user" id="navUser"></span></li>
-                <li><a href="#" id="logoutLink" onclick="logoutUser(); return false;">Logout</a></li>
+                <li><a href="login.html" id="logoutLink" onclick="logoutUser(); return false;">Logout</a></li>
             </ul>
         </div>
     </nav>
@@ -43,9 +44,16 @@
                 </div>
             </div>
             <div class="stat-card">
+                <div class="stat-icon">⏭️</div>
+                <div>
+                    <div class="stat-value" id="statUpcoming">—</div>
+                    <div class="stat-label">Upcoming</div>
+                </div>
+            </div>
+            <div class="stat-card">
                 <div class="stat-icon">👨‍🔧</div>
                 <div>
-                    <div class="stat-value" id="statMechanics">5</div>
+                    <div class="stat-value" id="statMechanics">—</div>
                     <div class="stat-label">Active Mechanics</div>
                 </div>
             </div>
@@ -59,8 +67,8 @@
                 </div>
             </div>
             <div class="filter-bar">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search by name, phone, license...">
-                <button class="btn btn-secondary btn-sm" id="refreshBtn" onclick="loadAppointments()">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search by name, phone, license, mechanic or date...">
+                <button class="btn btn-secondary btn-sm" id="refreshBtn" type="button">
                     ↻ Refresh
                 </button>
             </div>
@@ -84,7 +92,7 @@
             <div class="empty-state" id="emptyState" style="display: none;">
                 <div class="empty-icon">📭</div>
                 <h3>No Appointments Found</h3>
-                <p>There are no appointments in the system yet. Clients can book through the <a href="index.html" style="color: var(--accent-blue);">booking page</a>.</p>
+                <p>There are no appointments in the system yet.</p>
             </div>
         </div>
     </div>
@@ -92,25 +100,24 @@
         <div class="modal">
             <div class="modal-header">
                 <h3>✏️ Edit Appointment</h3>
-                <button class="modal-close" onclick="closeEditModal()">&times;</button>
+                <button class="modal-close" type="button" aria-label="Close" onclick="closeEditModal()">&times;</button>
             </div>
             <form id="editForm" novalidate>
-                <input type="hidden" id="editAppointmentId">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Client Name</label>
-                        <input type="text" id="editClientName" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        <label for="editClientName">Client Name</label>
+                        <input type="text" id="editClientName" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Phone</label>
-                        <input type="text" id="editPhone" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        <label for="editPhone">Phone</label>
+                        <input type="text" id="editPhone" readonly>
                     </div>
                     <div class="form-group">
-                        <label>Car License</label>
-                        <input type="text" id="editCarLicense" readonly style="opacity: 0.6; cursor: not-allowed;">
+                        <label for="editCarLicense">Car License</label>
+                        <input type="text" id="editCarLicense" readonly>
                     </div>
                 </div>
-                <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1.25rem 0;">
+                <hr class="modal-divider">
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="editDate">Appointment Date <span class="required">*</span></label>
@@ -139,6 +146,7 @@
     <footer class="footer">
         <p>&copy; 2026 AutoCare Workshop. All rights reserved.</p>
     </footer>
+    <script src="js/common.js"></script>
     <script src="js/auth-guard.js" data-role="admin"></script>
     <script src="js/admin.js"></script>
 </body>

@@ -1,38 +1,25 @@
+// Protects a page: redirects to login when logged out, and to the right
+// dashboard when the page's data-role doesn't match the user's role.
+const requiredRole = document.currentScript ? document.currentScript.getAttribute('data-role') : null;
 
-const AUTH_API = 'api/auth.php';
-const currentScript = document.currentScript;
-const requiredRole = currentScript ? currentScript.getAttribute('data-role') : null;
-let currentUser = null;
 async function logoutUser() {
     try {
-        await fetch(AUTH_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'logout' })
-        });
+        await apiRequest('auth.php', 'POST', { action: 'logout' });
     } catch (e) {
+        // Redirect to login regardless.
     }
     window.location.href = 'login.html';
 }
+
 (async function authGuard() {
     try {
-        const response = await fetch(AUTH_API, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ action: 'check' })
-        });
-        const result = await response.json();
+        const { result } = await apiRequest('auth.php', 'POST', { action: 'check' });
         if (!result.authenticated) {
             window.location.href = 'login.html';
             return;
         }
-        currentUser = result.data;
         if (requiredRole && result.data.role !== requiredRole) {
-            if (result.data.role === 'admin') {
-                window.location.href = 'admin.html';
-            } else {
-                window.location.href = 'index.html';
-            }
+            window.location.href = homePageFor(result.data.role);
             return;
         }
         const navUser = document.getElementById('navUser');

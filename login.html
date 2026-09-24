@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Login to AutoCare Workshop appointment system.">
     <title>AutoCare Workshop — Login</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔧</text></svg>">
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -26,7 +27,7 @@
             <h1>Welcome <span class="gradient-text">Back</span></h1>
             <p>Login to book appointments or manage the workshop dashboard.</p>
         </div>
-        <div class="card auth-card" style="max-width: 460px; margin: 0 auto;">
+        <div class="card auth-card">
             <div class="card-header">
                 <div class="icon">🔐</div>
                 <div>
@@ -35,7 +36,7 @@
                 </div>
             </div>
             <form id="loginForm" novalidate>
-                <div class="form-grid" style="grid-template-columns: 1fr;">
+                <div class="form-grid">
                     <div class="form-group">
                         <label for="email">Email Address <span class="required">*</span></label>
                         <input type="email" id="email" name="email" placeholder="e.g. user@example.com" required>
@@ -47,8 +48,8 @@
                         <span class="error-msg" id="passwordError">Password is required.</span>
                     </div>
                 </div>
-                <div class="form-actions" style="flex-direction: column; align-items: stretch;">
-                    <button type="submit" class="btn btn-primary" id="loginBtn" style="width: 100%;">
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" id="loginBtn">
                         🔑 Login
                     </button>
                 </div>
@@ -56,7 +57,7 @@
                     <p>Don't have an account? <a href="signup.html">Create one here</a></p>
                 </div>
             </form>
-            <div class="help-section" style="margin-top: 1.5rem;">
+            <div class="help-section">
                 <button class="help-toggle" id="helpToggle" type="button">
                     <span class="help-icon">💡</span>
                     <span>Demo Admin Credentials</span>
@@ -68,14 +69,14 @@
                             <div class="step">📧</div>
                             <div class="help-text">
                                 <h4>Email</h4>
-                                <p style="font-family: monospace;">admin@autocare.com</p>
+                                <p class="monospace">admin@autocare.com</p>
                             </div>
                         </div>
                         <div class="help-item">
                             <div class="step">🔑</div>
                             <div class="help-text">
                                 <h4>Password</h4>
-                                <p style="font-family: monospace;">password</p>
+                                <p class="monospace">password</p>
                             </div>
                         </div>
                     </div>
@@ -86,102 +87,7 @@
     <footer class="footer">
         <p>&copy; 2026 AutoCare Workshop. All rights reserved.</p>
     </footer>
-    <script>
-        const API_BASE = 'api';
-        const toastContainer = document.getElementById('toastContainer');
-        const loginForm = document.getElementById('loginForm');
-        const loginBtn = document.getElementById('loginBtn');
-        // Toast system
-        function showToast(type, title, message, duration = 5000) {
-            const icons = { success: '✓', error: '✕', warning: '⚠', info: 'ℹ' };
-            const toast = document.createElement('div');
-            toast.className = `toast ${type}`;
-            toast.innerHTML = `
-                <div class="toast-icon">${icons[type] || 'ℹ'}</div>
-                <div class="toast-content">
-                    <div class="toast-title">${title}</div>
-                    <div class="toast-message">${message}</div>
-                </div>
-                <button class="toast-close" onclick="this.parentElement.classList.add('removing'); setTimeout(() => this.parentElement.remove(), 300)">&times;</button>
-            `;
-            toastContainer.appendChild(toast);
-            setTimeout(() => { toast.classList.add('removing'); setTimeout(() => toast.remove(), 300); }, duration);
-        }
-        // Help toggle
-        document.getElementById('helpToggle').addEventListener('click', function() {
-            this.classList.toggle('active');
-            document.getElementById('helpContent').classList.toggle('active');
-        });
-        // Check if already logged in — redirect accordingly
-        (async function checkSession() {
-            try {
-                const res = await fetch(`${API_BASE}/auth.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'check' })
-                });
-                const result = await res.json();
-                if (result.authenticated) {
-                    window.location.href = result.data.role === 'admin' ? 'admin.html' : 'index.html';
-                }
-            } catch (e) {
-                // Server unavailable — stay on login page
-            }
-        })();
-        // Login form submission
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            // Validate
-            let hasError = false;
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('email').classList.add('error');
-                document.getElementById('emailError').classList.add('visible');
-                hasError = true;
-            } else {
-                document.getElementById('email').classList.remove('error');
-                document.getElementById('emailError').classList.remove('visible');
-            }
-            if (!password) {
-                document.getElementById('password').classList.add('error');
-                document.getElementById('passwordError').classList.add('visible');
-                hasError = true;
-            } else {
-                document.getElementById('password').classList.remove('error');
-                document.getElementById('passwordError').classList.remove('visible');
-            }
-            if (hasError) return;
-            // Submit
-            loginBtn.disabled = true;
-            const originalText = loginBtn.innerHTML;
-            loginBtn.innerHTML = '<span class="spinner"></span> Logging in...';
-            let responseText = '';
-            try {
-                const res = await fetch(`${API_BASE}/auth.php`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'login', email, password })
-                });
-                responseText = await res.text();
-                const result = JSON.parse(responseText);
-                if (result.success) {
-                    showToast('success', 'Welcome!', `Logged in as ${result.data.name}`);
-                    setTimeout(() => {
-                        window.location.href = result.data.role === 'admin' ? 'admin.html' : 'index.html';
-                    }, 800);
-                } else {
-                    showToast('error', 'Login Failed', result.message);
-                }
-            } catch (error) {
-                console.error('Login connection/parse error:', error);
-                console.error('Raw Server Response was:', responseText);
-                showToast('error', 'Connection/Server Error', 'Unable to parse server response. Check browser console (F12) for detailed logs.');
-            } finally {
-                loginBtn.disabled = false;
-                loginBtn.innerHTML = originalText;
-            }
-        });
-    </script>
+    <script src="js/common.js"></script>
+    <script src="js/login.js"></script>
 </body>
 </html>
